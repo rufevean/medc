@@ -1,0 +1,10 @@
+.faq-footer{
+        font-family: 'Nunito', sans-serif;
+    font-size: 1.2rem;
+    display: flex;
+    gap: 3rem;
+    text-decoration: underline;
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding-right: 5rem;
+}

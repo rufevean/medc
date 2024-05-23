@@ -1,0 +1,126 @@
+
+/* c1 */
+.c1 {
+    display: flex;
+    min-width: 80vw;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    text-align: center;
+    padding: 7rem 10rem 5rem 10rem;
+    align-items: center;
+    margin-left: 10vw;
+}
+
+/* c1a */
+.c1a {
+    font-size: 1.5rem;
+    border: 5px dashed black;
+    border-radius: 50%;
+    height: 7rem;
+    width: 7rem;
+    font-family: 'Nunito', sans-serif;
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* c1b */
+.c1b {
+    font-size: 1.5rem;
+    font-family: 'Nunito', sans-serif;
+    padding: 0 30rem 0 5rem;
+    font-weight: 600;
+}
+
+/* c2 */
+.c2 {
+    display: flex;
+    min-width: 80vw;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    text-align: center;
+    padding: 5rem 10rem;
+    align-items: center;
+    margin-left: 20vw;
+}
+
+/* c2a */
+.c2a {
+    font-size: 1.5rem;
+    border: 5px dashed black;
+    border-radius: 50%;
+    height: 7rem;
+    width: 7rem;
+    font-family: 'Nunito', sans-serif;
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* c2b */
+.c2b {
+    font-size: 1.5rem;
+    font-family: 'Nunito', sans-serif;
+    padding: 0 30rem 0 5rem;
+    font-weight: 600;
+}
+
+/* c3 */
+.c3 {
+    display: flex;
+    min-width: 80vw;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    text-align: center;
+    padding: 5rem 10rem;
+    align-items: center;
+    margin-left: 8vw;
+}
+
+/* c3a */
+.c3a {
+    font-size: 1.5rem;
+    border: 5px dashed black;
+    border-radius: 50%;
+    height: 7rem;
+    width: 7rem;
+    font-family: 'Nunito', sans-serif;
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* c3b */
+.c3b {
+    font-size: 1.5rem;
+    font-family: 'Nunito', sans-serif;
+    padding: 0 30rem 0 5rem;
+    font-weight: 600;
+}
+
+/* bg */
+.bg {
+    z-index: -1;
+    position: absolute;
+    top: 130vh;
+    left: 25vw;
+}
+
+/* left */
+.left {
+    z-index: -1;
+    position: absolute;
+    top: 120vh;
+    left: 3vw;
+}
+
+/* right */
+.right {
+    z-index: -1;
+    position: absolute;
+    top: 120vh;
+    right: 3vw;
+}

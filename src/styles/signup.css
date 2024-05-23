@@ -1,0 +1,21 @@
+
+.su-container {
+  background-color: #000; /* Glossy black background color */
+  color: #fff; /* Text color */
+  padding: 20px; /* Padding around the content */
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Drop shadow */
+  width: 300px; /* Adjust width as needed */
+  margin: 0 auto; /* Center horizontally */
+    align-items: center; 
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.signup{
+    height:100vh;
+    align-items: center;
+    display: flex;
+}
+

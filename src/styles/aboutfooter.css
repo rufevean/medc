@@ -1,0 +1,14 @@
+
+.abf-style {
+    display: flex;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.5rem;
+    justify-content: flex-end;
+    padding: 0 10rem;
+    gap:1rem;
+}
+
+a{
+    text-decoration: underline;
+    color: #000;
+}
