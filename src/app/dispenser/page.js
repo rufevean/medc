@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore'; // Import Firestore
+import Tesseract from 'tesseract.js'; // Import Tesseract.js
 import SignedNav from './signednav.js';
 import '../../styles/dispenser.css';
 
@@ -88,6 +89,23 @@ export default function Page() {
     handleInputChange(id, repeatField, newRepeatStatus);
   };
 
+  const handleFileUpload = async (id, event) => {
+    const file = event.target.files[0];
+    if (file) {
+      Tesseract.recognize(
+        file,
+        'eng',
+        {
+          logger: (m) => console.log(m),
+        }
+      ).then(({ data: { text } }) => {
+        handleInputChange(id, 'ocrText', text);
+      }).catch((error) => {
+        console.error('Error:', error);
+      });
+    }
+  };
+
   return (
     <div className="dispenser">
       <SignedNav />
@@ -156,6 +174,10 @@ export default function Page() {
               <button className="save-button" onClick={() => handleSave(dispenser.id)}>Save</button>
               <button className="delete-button" onClick={() => handleDelete(dispenser.id)}>Delete</button>
             </div>
+            <div className="upload-container">
+              <input type="file" onChange={(event) => handleFileUpload(dispenser.id, event)} />
+              {dispenser.ocrText && <p className="ocr-result">{dispenser.ocrText}</p>}
+            </div>
           </div>
         ))}
       </div>
@@ -188,6 +210,7 @@ function DispenserForm({ onSubmit }) {
       slot2Quantity: '',
       slot2Alarm: '',
       slot2Repeat: false, // Initialize repeat status
+      ocrText: '', // Initialize OCR text
     });
     setName('');
     setRole('');
