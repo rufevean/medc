@@ -4,7 +4,6 @@
 import React, { useState, useEffect } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore'; // Import Firestore
-import Tesseract from 'tesseract.js'; // Import Tesseract.js
 import SignedNav from './signednav.js';
 import '../../styles/dispenser.css';
 
@@ -89,20 +88,14 @@ export default function Page() {
     handleInputChange(id, repeatField, newRepeatStatus);
   };
 
-  const handleFileUpload = async (id, event) => {
+  const handleFileUpload = (id, event) => {
     const file = event.target.files[0];
     if (file) {
-      Tesseract.recognize(
-        file,
-        'eng',
-        {
-          logger: (m) => console.log(m),
-        }
-      ).then(({ data: { text } }) => {
-        handleInputChange(id, 'ocrText', text);
-      }).catch((error) => {
-        console.error('Error:', error);
-      });
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        handleInputChange(id, 'imageUrl', reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -116,8 +109,27 @@ export default function Page() {
         {dispensers.map(dispenser => (
           <div key={dispenser.id} className="dispenser-item">
             <div className="dispenser-info">
-              <p className="dispenser-name">{dispenser.name}</p>
+              {dispenser['editMode'] ? (
+                <input
+                  type="text"
+                  placeholder="Dispenser Name"
+                  value={dispenser.name}
+                  onChange={(e) => handleInputChange(dispenser.id, 'name', e.target.value)}
+                />
+              ) : (
+                <p className="dispenser-name">{dispenser.name}</p>
+              )}
               <p className="dispenser-role">Role: {dispenser.role}</p>
+              {dispenser['editMode'] ? (
+                <input
+                  type="text"
+                  placeholder="Patient Name"
+                  value={dispenser.patientName}
+                  onChange={(e) => handleInputChange(dispenser.id, 'patientName', e.target.value)}
+                />
+              ) : (
+                <p className="patient-name">Patient: {dispenser.patientName}</p>
+              )}
             </div>
             <div className="medicine-container">
               {[1, 2].map(slot => (
@@ -176,7 +188,7 @@ export default function Page() {
             </div>
             <div className="upload-container">
               <input type="file" onChange={(event) => handleFileUpload(dispenser.id, event)} />
-              {dispenser.ocrText && <p className="ocr-result">{dispenser.ocrText}</p>}
+              {dispenser.imageUrl && <img src={dispenser.imageUrl} alt="Uploaded" className="uploaded-image" />}
             </div>
           </div>
         ))}
@@ -196,12 +208,14 @@ export default function Page() {
 function DispenserForm({ onSubmit }) {
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
+  const [patientName, setPatientName] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit({
       name,
       role,
+      patientName,
       slot1: '',
       slot1Quantity: '',
       slot1Alarm: '',
@@ -210,10 +224,11 @@ function DispenserForm({ onSubmit }) {
       slot2Quantity: '',
       slot2Alarm: '',
       slot2Repeat: false, // Initialize repeat status
-      ocrText: '', // Initialize OCR text
+      imageUrl: '', // Initialize image URL
     });
     setName('');
     setRole('');
+    setPatientName('');
   };
 
   return (
@@ -224,6 +239,7 @@ function DispenserForm({ onSubmit }) {
         <option value="caretaker">Caretaker</option>
         <option value="doctor">Doctor</option>
       </select>
+      <input type="text" placeholder="Patient Name" value={patientName} onChange={(e) => setPatientName(e.target.value)} required />
       <button type="submit">Submit</button>
     </form>
   );
