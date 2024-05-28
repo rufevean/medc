@@ -1,11 +1,11 @@
-"use client"
+
+"use client";
 
 import React, { useEffect } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebaseui/dist/firebaseui.css'; // Import FirebaseUI CSS
 import * as firebaseui from 'firebaseui'; // Import FirebaseUI correctly
-
 
 const firebaseConfig = require('../../../fb.js');
 const firebaseApp = firebase.initializeApp(firebaseConfig);

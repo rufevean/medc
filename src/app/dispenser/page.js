@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import firebase from 'firebase/compat/app';
-import 'firebase/compat/firestore'; // Import Firestore
+import 'firebase/compat/firestore';
 import SignedNav from './signednav.js';
 import '../../styles/dispenser.css';
 
@@ -13,7 +13,7 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
-const db = firebase.firestore(); // Get a Firestore instance
+const db = firebase.firestore();
 
 export default function Page() {
   const [isPopupOpen, setPopupOpen] = useState(false);
@@ -22,7 +22,7 @@ export default function Page() {
   useEffect(() => {
     const unsubscribe = db.collection('dispensers').onSnapshot(snapshot => {
       const newDispensers = snapshot.docs.map(doc => ({
-        id: doc.id, // Using auto-generated document ID
+        id: doc.id,
         ...doc.data()
       }));
       setDispensers(newDispensers);
@@ -61,7 +61,6 @@ export default function Page() {
     updatedDispensers[index]['editMode'] = false;
     setDispensers(updatedDispensers);
 
-    // Check if the document exists before updating
     const docRef = db.collection('dispensers').doc(id);
     const doc = await docRef.get();
 
@@ -69,7 +68,6 @@ export default function Page() {
       await docRef.update(updatedDispensers[index]);
     } else {
       console.log('Document does not exist');
-      // Handle this scenario as needed, e.g., show an error message to the user
     }
   };
 
@@ -80,9 +78,9 @@ export default function Page() {
     setDispensers(updatedDispensers);
   };
 
-  const handleRepeatOption = async (id, slot) => {
+  const handleRepeatOption = async (id, slot, alarm) => {
     const dispenser = dispensers.find(d => d.id === id);
-    const repeatField = `slot${slot}Repeat`;
+    const repeatField = `slot${slot}Alarm${alarm}Repeat`;
     const newRepeatStatus = !dispenser[repeatField];
     await db.collection('dispensers').doc(id).update({ [repeatField]: newRepeatStatus });
     handleInputChange(id, repeatField, newRepeatStatus);
@@ -158,26 +156,31 @@ export default function Page() {
                       <p>{dispenser[`slot${slot}Quantity`]}</p>
                     )}
                   </div>
-                  <div className="alarm">
-                    {dispenser['editMode'] ? (
-                      <input
-                        placeholder="HH:MM"
-                        type="time"
-                        value={dispenser[`slot${slot}Alarm`]}
-                        onChange={(e) => handleInputChange(dispenser.id, `slot${slot}Alarm`, e.target.value)}
-                      />
-                    ) : (
-                      <p>{dispenser[`slot${slot}Alarm`]}</p>
-                    )}
-                  </div>
-                  <div className="repeat">
-                    <button
-                      className="repeat-button"
-                      onClick={() => handleRepeatOption(dispenser.id, slot)}
-                    >
-                      {dispenser[`slot${slot}Repeat`] ? 'Repeat On' : 'Repeat Off'}
-                    </button>
-                  </div>
+                  {[1, 2, 3].map(alarm => (
+                    <div key={alarm} className="alarm">
+                      {dispenser['editMode'] ? (
+                        <div>
+                          <input
+                            placeholder="HH:MM"
+                            type="time"
+                            value={dispenser[`slot${slot}Alarm${alarm}`]}
+                            onChange={(e) => handleInputChange(dispenser.id, `slot${slot}Alarm${alarm}`, e.target.value)}
+                          />
+                          <button
+                            className="repeat-button"
+                            onClick={() => handleRepeatOption(dispenser.id, slot, alarm)}
+                          >
+                            {dispenser[`slot${slot}Alarm${alarm}Repeat`] ? 'Repeat On' : 'Repeat Off'}
+                          </button>
+                        </div>
+                      ) : (
+                        <div>
+                          <p>{dispenser[`slot${slot}Alarm${alarm}`]}</p>
+                          <p>{dispenser[`slot${slot}Alarm${alarm}Repeat`] ? 'Repeat On' : 'Repeat Off'}</p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>
@@ -218,13 +221,21 @@ function DispenserForm({ onSubmit }) {
       patientName,
       slot1: '',
       slot1Quantity: '',
-      slot1Alarm: '',
-      slot1Repeat: false, // Initialize repeat status
+      slot1Alarm1: '',
+      slot1Alarm1Repeat: false,
+      slot1Alarm2: '',
+      slot1Alarm2Repeat: false,
+      slot1Alarm3: '',
+      slot1Alarm3Repeat: false,
       slot2: '',
       slot2Quantity: '',
-      slot2Alarm: '',
-      slot2Repeat: false, // Initialize repeat status
-      imageUrl: '', // Initialize image URL
+      slot2Alarm1: '',
+      slot2Alarm1Repeat: false,
+      slot2Alarm2: '',
+      slot2Alarm2Repeat: false,
+      slot2Alarm3: '',
+      slot2Alarm3Repeat: false,
+      imageUrl: '',
     });
     setName('');
     setRole('');
