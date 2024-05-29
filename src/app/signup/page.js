@@ -7,47 +7,49 @@ import 'firebase/compat/auth';
 import 'firebaseui/dist/firebaseui.css'; // Import FirebaseUI CSS
 import * as firebaseui from 'firebaseui'; // Import FirebaseUI correctly
 
-const firebaseConfig = require('../../../fb.js');
-const firebaseApp = firebase.initializeApp(firebaseConfig);
-const auth = firebaseApp.auth();
+import firebaseConfig from '../../../fb.js';
 
+// Initialize Firebase app and authentication
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+const auth = firebase.auth();
 const ui = new firebaseui.auth.AuthUI(auth);
 
 const AuthComponent = () => {
   useEffect(() => {
-    const uiConfig = {
-      callbacks: {
-        signInSuccessWithAuthResult: async function(authResult, redirectUrl) {
-          const email = authResult.user.email;
-          const userExists = await checkUserExists(email);
-          if (userExists) {
-            // Redirect to existing user component
-            window.location.assign('/existingUserComponent');
-          } else {
-            // Continue with default sign-in success behavior
-            return true;
+    // Ensure this code runs only on the client side
+    if (typeof window !== 'undefined') {
+      const uiConfig = {
+        callbacks: {
+          signInSuccessWithAuthResult: async (authResult, redirectUrl) => {
+            const email = authResult.user.email;
+            const userExists = await checkUserExists(email);
+            if (userExists) {
+              // Redirect to existing user component
+              window.location.assign('/existingUserComponent');
+            } else {
+              // Continue with default sign-in success behavior
+              return true;
+            }
+          },
+          uiShown: () => {
+            document.getElementById('loader').style.display = 'none';
           }
         },
-        uiShown: function() {
-          document.getElementById('loader').style.display = 'none';
-        }
-      },
-      // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
-      signInFlow: 'popup',
-      signInSuccessUrl: '/dispenser',
-      signInOptions: [
-        // List of OAuth providers supported.
-        firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-        firebase.auth.EmailAuthProvider.PROVIDER_ID
-      ],
-      // Terms of service url.
-      tosUrl: '<your-tos-url>',
-      // Privacy policy url.
-      privacyPolicyUrl: '<your-privacy-policy-url>'
-    };
+        signInFlow: 'popup',
+        signInSuccessUrl: '/dispenser',
+        signInOptions: [
+          firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+          firebase.auth.EmailAuthProvider.PROVIDER_ID
+        ],
+        tosUrl: '<your-tos-url>',
+        privacyPolicyUrl: '<your-privacy-policy-url>'
+      };
 
-    // Render FirebaseUI Auth interface
-    ui.start('#firebaseui-auth-container', uiConfig);
+      // Render FirebaseUI Auth interface
+      ui.start('#firebaseui-auth-container', uiConfig);
+    }
   }, []);
 
   return (

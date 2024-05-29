@@ -3,9 +3,10 @@
 
 import React, { useState, useEffect } from 'react';
 import firebase from 'firebase/compat/app';
-import 'firebase/compat/firestore';
+import 'firebase/compat/firestore'; // Import Firestore
 import SignedNav from './signednav.js';
 import '../../styles/dispenser.css';
+import Image from 'next/image';
 
 const firebaseConfig = require('../../../fb.js');
 // Initialize Firebase
@@ -13,7 +14,7 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
-const db = firebase.firestore();
+const db = firebase.firestore(); // Get a Firestore instance
 
 export default function Page() {
   const [isPopupOpen, setPopupOpen] = useState(false);
@@ -22,7 +23,7 @@ export default function Page() {
   useEffect(() => {
     const unsubscribe = db.collection('dispensers').onSnapshot(snapshot => {
       const newDispensers = snapshot.docs.map(doc => ({
-        id: doc.id,
+        id: doc.id, // Using auto-generated document ID
         ...doc.data()
       }));
       setDispensers(newDispensers);
@@ -61,6 +62,7 @@ export default function Page() {
     updatedDispensers[index]['editMode'] = false;
     setDispensers(updatedDispensers);
 
+    // Check if the document exists before updating
     const docRef = db.collection('dispensers').doc(id);
     const doc = await docRef.get();
 
@@ -68,6 +70,7 @@ export default function Page() {
       await docRef.update(updatedDispensers[index]);
     } else {
       console.log('Document does not exist');
+      // Handle this scenario as needed, e.g., show an error message to the user
     }
   };
 
@@ -132,53 +135,52 @@ export default function Page() {
             <div className="medicine-container">
               {[1, 2].map(slot => (
                 <div key={slot} className="medicine">
-                  <div className="slot">
-                    {dispenser['editMode'] ? (
-                      <input
-                        type="text"
-                        placeholder="Medicine"
-                        value={dispenser[`slot${slot}`]}
-                        onChange={(e) => handleInputChange(dispenser.id, `slot${slot}`, e.target.value)}
-                      />
-                    ) : (
-                      <p>{dispenser[`slot${slot}`]}</p>
-                    )}
-                  </div>
-                  <div className="quantity">
-                    {dispenser['editMode'] ? (
-                      <input
-                        placeholder="Quantity"
-                        type="number"
-                        value={dispenser[`slot${slot}Quantity`]}
-                        onChange={(e) => handleInputChange(dispenser.id, `slot${slot}Quantity`, e.target.value)}
-                      />
-                    ) : (
-                      <p>{dispenser[`slot${slot}Quantity`]}</p>
-                    )}
-                  </div>
                   {[1, 2, 3].map(alarm => (
-                    <div key={alarm} className="alarm">
-                      {dispenser['editMode'] ? (
-                        <div>
+                    <div key={alarm} className="alarm-group">
+                      <div className="slot">
+                        {dispenser['editMode'] ? (
+                          <input
+                            type="text"
+                            placeholder="Medicine"
+                            value={dispenser[`slot${slot}`]}
+                            onChange={(e) => handleInputChange(dispenser.id, `slot${slot}`, e.target.value)}
+                          />
+                        ) : (
+                          <p>{dispenser[`slot${slot}`]}</p>
+                        )}
+                      </div>
+                      <div className="quantity">
+                        {dispenser['editMode'] ? (
+                          <input
+                            placeholder="Quantity"
+                            type="number"
+                            value={dispenser[`slot${slot}Quantity`]}
+                            onChange={(e) => handleInputChange(dispenser.id, `slot${slot}Quantity`, e.target.value)}
+                          />
+                        ) : (
+                          <p>{dispenser[`slot${slot}Quantity`]}</p>
+                        )}
+                      </div>
+                      <div className="alarm">
+                        {dispenser['editMode'] ? (
                           <input
                             placeholder="HH:MM"
                             type="time"
                             value={dispenser[`slot${slot}Alarm${alarm}`]}
                             onChange={(e) => handleInputChange(dispenser.id, `slot${slot}Alarm${alarm}`, e.target.value)}
                           />
-                          <button
-                            className="repeat-button"
-                            onClick={() => handleRepeatOption(dispenser.id, slot, alarm)}
-                          >
-                            {dispenser[`slot${slot}Alarm${alarm}Repeat`] ? 'Repeat On' : 'Repeat Off'}
-                          </button>
-                        </div>
-                      ) : (
-                        <div>
+                        ) : (
                           <p>{dispenser[`slot${slot}Alarm${alarm}`]}</p>
-                          <p>{dispenser[`slot${slot}Alarm${alarm}Repeat`] ? 'Repeat On' : 'Repeat Off'}</p>
-                        </div>
-                      )}
+                        )}
+                      </div>
+                      <div className="repeat">
+                        <button
+                          className="repeat-button"
+                          onClick={() => handleRepeatOption(dispenser.id, slot, alarm)}
+                        >
+                          {dispenser[`slot${slot}Alarm${alarm}Repeat`] ? 'Repeat On' : 'Repeat Off'}
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -191,7 +193,7 @@ export default function Page() {
             </div>
             <div className="upload-container">
               <input type="file" onChange={(event) => handleFileUpload(dispenser.id, event)} />
-              {dispenser.imageUrl && <img src={dispenser.imageUrl} alt="Uploaded" className="uploaded-image" />}
+              {dispenser.imageUrl && <Image src={dispenser.imageUrl} alt="Uploaded" className="uploaded-image" width={100} height={100} />}
             </div>
           </div>
         ))}
@@ -235,22 +237,30 @@ function DispenserForm({ onSubmit }) {
       slot2Alarm2Repeat: false,
       slot2Alarm3: '',
       slot2Alarm3Repeat: false,
-      imageUrl: '',
+      imageUrl: ''
     });
-    setName('');
-    setRole('');
-    setPatientName('');
   };
 
   return (
-    <form className="submitform" onSubmit={handleSubmit}>
-      <input type="text" placeholder="Dispenser Name" value={name} onChange={(e) => setName(e.target.value)} required />
-      <select value={role} onChange={(e) => setRole(e.target.value)} required>
-        <option value="">Select Role</option>
-        <option value="caretaker">Caretaker</option>
-        <option value="doctor">Doctor</option>
-      </select>
-      <input type="text" placeholder="Patient Name" value={patientName} onChange={(e) => setPatientName(e.target.value)} required />
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        placeholder="Dispenser Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <input
+        type="text"
+        placeholder="Role"
+        value={role}
+        onChange={(e) => setRole(e.target.value)}
+      />
+      <input
+        type="text"
+        placeholder="Patient Name"
+        value={patientName}
+        onChange={(e) => setPatientName(e.target.value)}
+      />
       <button type="submit">Submit</button>
     </form>
   );

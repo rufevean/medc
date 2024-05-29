@@ -1,5 +1,6 @@
 
 import '../styles/homefooter.css';
+import Image from 'next/image';
 
 export default function HomeFooter() {
     return (
@@ -13,10 +14,9 @@ export default function HomeFooter() {
                 </div>
                 <div className="f2">
                     About Us
-                    <img className="homefooterimg" src="/static/arrow.png"/>
+                    <Image className="homefooterimg" src="/static/arrow.png" alt="Arrow" width={20} height={20} />
                 </div>
             </div>
         </div>
     );
 }
-

@@ -1,12 +1,12 @@
-// faqcontent.js
+
 "use client"
+
 // Import CSS and React
 import '../styles/faqcontent.css';
-import React, { useClient, useState } from 'react';
+import React, { useState } from 'react';
+import Image from 'next/image';
 
 // Define the component as a Client Component
-
-// Define the component
 function FAQContent() {
     // Use useState within the component
     const [show1, setShow1] = useState(false);
@@ -20,7 +20,7 @@ function FAQContent() {
             <div className='question'>
                 1. Do I need Wi-Fi for the MediControl Hub to work?
                 <button onClick={() => setShow1(!show1)}>
-                    <img src='./static/down.png' alt='Toggle' />
+                    <Image src='/static/down.png' alt='Toggle' width={20} height={20} />
                 </button>
             </div>
             {show1 && (
@@ -31,7 +31,7 @@ function FAQContent() {
             <div className='question'>
                 2. Can I adjust the medication schedule if needed?
                 <button onClick={() => setShow2(!show2)}>
-                    <img src='./static/down.png' alt='Toggle' />
+                    <Image src='/static/down.png' alt='Toggle' width={20} height={20} />
                 </button>
             </div>
             {show2 && (
@@ -42,7 +42,7 @@ function FAQContent() {
             <div className='question'>
                 3. Is the system easy to use for elderly patients?
                 <button onClick={() => setShow3(!show3)}>
-                    <img src='./static/down.png' alt='Toggle' />
+                    <Image src='/static/down.png' alt='Toggle' width={20} height={20} />
                 </button>
             </div>
             {show3 && (
@@ -53,7 +53,7 @@ function FAQContent() {
             <div className='question'>
                 4. Is the MediControl Hub compatible with all types of medications?
                 <button onClick={() => setShow4(!show4)}>
-                    <img src='./static/down.png' alt='Toggle' />
+                    <Image src='/static/down.png' alt='Toggle' width={20} height={20} />
                 </button>
             </div>
             {show4 && (
@@ -67,4 +67,3 @@ function FAQContent() {
 
 // Export the component
 export default FAQContent;
-
