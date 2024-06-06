@@ -16,9 +16,12 @@ if (!firebase.apps.length) {
 
 const db = firebase.firestore(); // Get a Firestore instance
 
+
+
 export default function Page() {
   const [isPopupOpen, setPopupOpen] = useState(false);
   const [dispensers, setDispensers] = useState([]);
+  const [activePrescription, setActivePrescription] = useState(null);
 
   useEffect(() => {
     const unsubscribe = db.collection('dispensers').onSnapshot(snapshot => {
@@ -95,9 +98,14 @@ export default function Page() {
       const reader = new FileReader();
       reader.onloadend = () => {
         handleInputChange(id, 'imageUrl', reader.result);
+        handleInputChange(id, 'imageName', file.name);
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handlePrescriptionClick = (dispenser) => {
+    setActivePrescription(activePrescription === dispenser.id ? null : dispenser.id);
   };
 
   return (
@@ -135,32 +143,32 @@ export default function Page() {
             <div className="medicine-container">
               {[1, 2].map(slot => (
                 <div key={slot} className="medicine">
+                  <div className="slot">
+                    {dispenser['editMode'] ? (
+                      <input
+                        placeholder="Slot"
+                        type="text"
+                        value={dispenser[`slot${slot}`]}
+                        onChange={(e) => handleInputChange(dispenser.id, `slot${slot}`, e.target.value)}
+                      />
+                    ) : (
+                      <p>{dispenser[`slot${slot}`]}</p>
+                    )}
+                  </div>
+                  <div className="quantity">
+                    {dispenser['editMode'] ? (
+                      <input
+                        placeholder="Quantity"
+                        type="number"
+                        value={dispenser[`slot${slot}Quantity`]}
+                        onChange={(e) => handleInputChange(dispenser.id, `slot${slot}Quantity`, e.target.value)}
+                      />
+                    ) : (
+                      <p>{dispenser[`slot${slot}Quantity`]}</p>
+                    )}
+                  </div>
                   {[1, 2, 3].map(alarm => (
                     <div key={alarm} className="alarm-group">
-                      <div className="slot">
-                        {dispenser['editMode'] ? (
-                          <input
-                            type="text"
-                            placeholder="Medicine"
-                            value={dispenser[`slot${slot}`]}
-                            onChange={(e) => handleInputChange(dispenser.id, `slot${slot}`, e.target.value)}
-                          />
-                        ) : (
-                          <p>{dispenser[`slot${slot}`]}</p>
-                        )}
-                      </div>
-                      <div className="quantity">
-                        {dispenser['editMode'] ? (
-                          <input
-                            placeholder="Quantity"
-                            type="number"
-                            value={dispenser[`slot${slot}Quantity`]}
-                            onChange={(e) => handleInputChange(dispenser.id, `slot${slot}Quantity`, e.target.value)}
-                          />
-                        ) : (
-                          <p>{dispenser[`slot${slot}Quantity`]}</p>
-                        )}
-                      </div>
                       <div className="alarm">
                         {dispenser['editMode'] ? (
                           <input
@@ -195,6 +203,15 @@ export default function Page() {
               <input type="file" onChange={(event) => handleFileUpload(dispenser.id, event)} />
               {dispenser.imageUrl && <Image src={dispenser.imageUrl} alt="Uploaded" className="uploaded-image" width={100} height={100} />}
             </div>
+            <button className="prescription-button" onClick={() => handlePrescriptionClick(dispenser)}>Prescription</button>
+            <div className={`prescription-popup ${activePrescription === dispenser.id ? '' : 'hidden'}`}>
+              {activePrescription === dispenser.id && (
+                <div className="prescription-details">
+                  <Image src={dispenser.imageUrl} alt={dispenser.imageName} width={150} height={150} />
+                  <p>{dispenser.imageName}</p>
+                </div>
+              )}
+            </div>
           </div>
         ))}
       </div>
@@ -202,66 +219,9 @@ export default function Page() {
 
       {isPopupOpen && (
         <div className="popup">
-          {/* Popup content */}
           <DispenserForm onSubmit={handleSubmit} />
         </div>
       )}
     </div>
-  );
-}
-
-function DispenserForm({ onSubmit }) {
-  const [name, setName] = useState('');
-  const [role, setRole] = useState('');
-  const [patientName, setPatientName] = useState('');
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit({
-      name,
-      role,
-      patientName,
-      slot1: '',
-      slot1Quantity: '',
-      slot1Alarm1: '',
-      slot1Alarm1Repeat: false,
-      slot1Alarm2: '',
-      slot1Alarm2Repeat: false,
-      slot1Alarm3: '',
-      slot1Alarm3Repeat: false,
-      slot2: '',
-      slot2Quantity: '',
-      slot2Alarm1: '',
-      slot2Alarm1Repeat: false,
-      slot2Alarm2: '',
-      slot2Alarm2Repeat: false,
-      slot2Alarm3: '',
-      slot2Alarm3Repeat: false,
-      imageUrl: ''
-    });
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        placeholder="Dispenser Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Role"
-        value={role}
-        onChange={(e) => setRole(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Patient Name"
-        value={patientName}
-        onChange={(e) => setPatientName(e.target.value)}
-      />
-      <button type="submit">Submit</button>
-    </form>
   );
 }
